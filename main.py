@@ -1,64 +1,69 @@
-from typing import Optional
+from typing import Annotated
 
-from fastapi import FastAPI, HTTPException
-from fastapi.encoders import jsonable_encoder
-from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException, Depends
+from sqlmodel import Session, select
 
-
-class Task(BaseModel):
-    title: str
-    description: str | None = None
-
-
-class TaskUpdate(BaseModel):
-    title: Optional[str] = None
-    description: Optional[str] = None
-
+from database import create_db_and_tables, get_session
+from models import Task
+from schemas import TaskUpdate
 
 app = FastAPI()
-
-tasks = [
-    {"title": "Hello world", "description": ""},
-    {"title": "Second task", "description": "some random shit"},
-]
+@app.on_event("startup")
+def on_startup():
+    create_db_and_tables()
 
 @app.post("/tasks")
-async def create_task(task: Task):
-    tasks.append(
-        {"title": task.title, "description": task.description}
-    )
-    return tasks
+async def create_task(
+    task: Task, 
+    session: Annotated[Session, Depends(get_session)],
+):
+    db_task = Task.model_validate(task)
+    session.add(db_task)
+    session.commit()
+    session.refresh(db_task)
+    return db_task
 
 @app.get("/tasks")
-async def get_tasks():
+async def get_tasks(
+    session: Annotated[Session, Depends(get_session)],
+) -> list[Task]:
+    tasks = session.exec(select(Task)).all()
     return tasks
 
 @app.get("/tasks/{task_id}")
-async def get_task(task_id: int):
-    if not tasks[task_id]:
+async def get_task(
+    task_id: int,
+    session: Annotated[Session, Depends(get_session)],
+) -> Task:
+    task = session.get(Task, task_id)
+    if not task:
         raise HTTPException(status_code=404, detail="Task not found")
-    return tasks[task_id]
-
-@app.put("/tasks/{task_id}")
-async def update_task(new_task: Task, task_id: int):
-    if not tasks[task_id]:
-        raise HTTPException(status_code=404, detail="Task not found")
-    updated_task = jsonable_encoder(new_task)
-    tasks[task_id] = updated_task
-    return tasks[task_id]
+    return task
 
 @app.patch("/tasks/{task_id}")
-async def update_task(task_id: int, new_task: TaskUpdate):
-    if not tasks[task_id]:
+async def update_task(
+    task_id: int, 
+    updated_task: TaskUpdate,
+    session: Annotated[Session, Depends(get_session)],
+):
+    task_db = session.get(Task, task_id)
+    if not task_db:
         raise HTTPException(status_code=404, detail="Task not found")
-    stored_task = tasks[task_id]
-    update_data = new_task.model_dump(exclude_unset=True)
-    stored_task.update(update_data)
-    return stored_task
+    task_data = updated_task.model_dump(exclude_unset=True)
+    task_db.sqlmodel_update(task_data)
+    session.add(task_db)
+    session.commit()
+    session.refresh(task_db)
+    return task_db
 
 @app.delete("/tasks/{task_id}")
-async def delte_task(task_id: int):
-    if not tasks[task_id]:
+async def delte_task(
+    task_id: int,
+    session: Annotated[Session, Depends(get_session)],
+):
+    task = session.get(Task, task_id)
+    if not task:
         raise HTTPException(status_code=404, detail="Task not found")
-    del tasks[task_id]
-    return tasks
+    session.delete(task)
+    session.commit()
+    return {"ok": True}
