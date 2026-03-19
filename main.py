@@ -35,8 +35,15 @@ async def create_task(
 async def get_tasks(
     session: Annotated[Session, Depends(get_session)],
     current_user: Annotated[User, Depends(get_current_user)],
+    completed: bool | None = None,
 ) -> list[Task]:
-    tasks = session.exec(select(Task).where(Task.owner_id == current_user.id))
+    if completed is None:
+        tasks = session.exec(select(Task).where(Task.owner_id == current_user.id))
+    else:
+        tasks = session.exec(select(Task).where(
+            Task.owner_id == current_user.id,
+            Task.completed == completed,
+        ))
     return tasks
 
 @app.get("/tasks/{task_id}", response_model=TaskRead)
