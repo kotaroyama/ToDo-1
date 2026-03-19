@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from typing import Annotated
 
 from fastapi import FastAPI, HTTPException, Depends
@@ -10,9 +11,10 @@ from models import Task, User
 from schemas import TaskCreate, TaskRead, TaskUpdate, Token
 
 app = FastAPI()
-@app.on_event("startup")
-def on_startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     create_db_and_tables()
+    yield
 
 @app.post("/tasks", response_model=TaskRead)
 async def create_task(
