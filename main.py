@@ -10,11 +10,11 @@ from database import create_db_and_tables, get_session
 from models import Task, User
 from schemas import TaskCreate, TaskRead, TaskUpdate, Token
 
-app = FastAPI()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     create_db_and_tables()
     yield
+app = FastAPI(lifespan=lifespan)
 
 @app.post("/tasks", response_model=TaskRead)
 async def create_task(
