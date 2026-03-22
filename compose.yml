@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:18
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: todo
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+  web:
+    image: todo1
+    build: .
+    container_name: todo1_1
+    ports:
+      - "80:8000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://myuser:mypassword@db:5432/todo
+      JWT_SECRET_KEY: 8742aec862deac2de9769a34d3f2614b806b61814d37313c7c9faf255406df86
+volumes:
+  postgres_data:
