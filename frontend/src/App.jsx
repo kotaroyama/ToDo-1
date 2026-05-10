@@ -23,10 +23,9 @@ export default function App() {
   return (
     <div>
       <nav>
-        <Link to="/">Home</Link>{" | "}
         {isLoggedIn ? (
           <>
-            <Link to="/tasks">Tasks</Link>{" | "}
+            <Link to="/">Home</Link>{" | "}
             <button
               onClick={() => {
                 logout();
