@@ -12,16 +12,25 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql
-  web:
+  backend:
     image: todo1
     build: .
     container_name: todo1_1
     ports:
-      - "80:8000"
+      - "8000:8000"
     depends_on:
       - db
     environment:
       DATABASE_URL: postgresql://myuser:mypassword@db:5432/todo
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+  frontend:
+    image: todo1_frontend
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    environment:
+      VITE_API_URL: http://host.docker.internal:8000
 volumes:
   postgres_data:
