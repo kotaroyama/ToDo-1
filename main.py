@@ -8,7 +8,7 @@ from sqlmodel import Session, select
 from auth import create_access_token, get_current_user, hash_password, verify_password
 from database import create_db_and_tables, get_session
 from models import Task, User
-from schemas import TaskCreate, TaskRead, TaskUpdate, Token
+from schemas import TaskCreate, TaskRead, TaskUpdate, Token, UserCreate
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -91,13 +91,12 @@ async def delte_task(
 
 @app.post("/register")
 async def register(
-    username: str,
-    password: str,
+    user_data: UserCreate,
     session: Annotated[Session, Depends(get_session)],
 ):
     user = User(
-        username=username,
-        hashed_password=hash_password(password),
+        username=user_data.username,
+        hashed_password=hash_password(user_data.password),
     )
     session.add(user)
     session.commit()
