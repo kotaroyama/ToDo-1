@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { apiFetch } from "../api";
 
 export default function TaskDetail() {
@@ -11,19 +11,14 @@ export default function TaskDetail() {
     apiFetch(`/tasks/${taskId}`).then(setTask);
   }, [taskId]);
 
-  async function deleteTask() {
-    await apiFetch(`/tasks/${taskId}`, { method: "DELETE" });
-    nativate("/tasks");
-  }
-
   if (!task) return <p>Loading...</p>;
 
   return (
     <div>
-      <h1>{task.title}</h1>
+      <h2>{task.title}</h2>
       <p>{task.description}</p>
       <p>{task.completed ? "Completed" : "Not completed"}</p>
-      <button onClick={deleteTask}>Delete</button>
+      <Link to={`/tasks`}>Back</Link>
     </div>
   );
 }

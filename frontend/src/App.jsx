@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { getToken, logout } from "./auth";
-import "./App.css";
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(Boolean(getToken()));

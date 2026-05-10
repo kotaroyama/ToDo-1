@@ -58,6 +58,11 @@ export default function Tasks() {
     await loadTasks();
   }
 
+  async function deleteTask() {
+    await apiFetch(`/tasks/${taskId}`, { method: "DELETE" });
+    nativate("/tasks");
+  }
+
   return (
     <div>
       <h1>Tasks</h1>
@@ -79,13 +84,17 @@ export default function Tasks() {
       <br />
       {tasks.toReversed().map((task) => (
         <div key={task.id}>
-          <Link to={`/tasks/${task.id}`}>{task.title}</Link>
-          <p>{task.description}</p>
-          <p>{task.completed ? "Completed" : "Not completed"}</p>
           {!task.completed && (
-            <button onClick={() => completeTask(task.id)}>Complete</button>
+            <div className="task-row">
+              <form onClick={() => completeTask(task.id)}>
+                <input type="checkbox" id="complete" value="complete" />
+              </form>
+              <Link to={`/tasks/${task.id}`} className="task-link">
+                {task.title}
+              </Link>
+              <button onClick={deleteTask}>Delete</button>
+            </div>
           )}
-          <br />
           <br />
         </div>
       ))}
