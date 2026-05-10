@@ -5,6 +5,7 @@ import { saveToken } from "../auth";
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [loginFailed, setLoginFailed] = useState(false);
   const { setIsLoggedIn } = useOutletContext();
   const navigate = useNavigate();
 
@@ -23,10 +24,18 @@ export default function Login() {
       body: formData,
     });
 
-    const data = await response.json();
-    saveToken(data.access_token);
-    setIsLoggedIn(true);
-    navigate("/tasks");
+    if (response.ok) {
+      const data = await response.json();
+      saveToken(data.access_token);
+      setIsLoggedIn(true);
+      navigate("/tasks");
+    } else {
+      setLoginFailed(true);
+      setTimeout(() => {
+        setLoginFailed(false);
+        navigate("/");
+      }, 1500)   
+    }
   }
 
   return (
@@ -47,9 +56,18 @@ export default function Login() {
         />
         <button type="submit">Login</button>
       </form>
-      <p>
-        New to Todo 1? <Link to="/register">Sign Up</Link>
-      </p>
+      {loginFailed ? (
+        <div>
+          <p>Username or Password Don't Match</p>
+          <p>Redirecting</p>
+        </div>
+      ) : (
+        <div>
+          <p>
+            New to Todo 1? <Link to="/register">Sign Up</Link>
+          </p>
+        </div>
+      )}
     </div>
   )
 }
