@@ -1,13 +1,53 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { apiFetch } from "../api";
+import { getToken } from "../auth";
 
 export default function Tasks() {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [tasks, setTasks] = useState([]);
+  const [error, setError] = useState("");
+
+  async function loadTasks() {
+    const data = await apiFetch("/tasks?completed=false");
+    setTasks(data);
+  }
 
   useEffect(() => {
-    apiFetch("/tasks?completed=false").then(setTasks);
+    loadTasks();
   }, []);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const token = getToken();
+  
+    try {
+      const response = await apiFetch('/tasks', {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            title,
+            description,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Task submission failed");
+      }
+
+    } catch (err) {
+      setError(err.message);
+    }
+
+    setTitle("");
+    setDescription("");
+    await loadTasks();
+  }
 
   async function completeTask(id) {
     const updated = await apiFetch(`/tasks/${id}`, {
@@ -15,13 +55,29 @@ export default function Tasks() {
       body: JSON.stringify({ completed: true }),
     });
     setTasks(tasks.map((task) => (task.id === id ? updated : task)));
+    await loadTasks();
   }
 
   return (
     <div>
       <h1>Tasks</h1>
-
-      {tasks.map((task) => (
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+        <button type="submit">Add</button>
+      </form>
+      <br />
+      {tasks.toReversed().map((task) => (
         <div key={task.id}>
           <Link to={`/tasks/${task.id}`}>{task.title}</Link>
           <p>{task.description}</p>
