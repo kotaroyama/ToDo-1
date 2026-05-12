@@ -35,8 +35,8 @@ def create_access_token(data: dict):
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 async def get_current_user(
-        token: Annotated[str, Depends(oauth2_scheme)],
-        session: Annotated[Session, Depends(get_session)]
+    token: Annotated[str, Depends(oauth2_scheme)],
+    session: Annotated[Session, Depends(get_session)]
 ):
     credentials_exception = HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
