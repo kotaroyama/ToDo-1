@@ -2,19 +2,29 @@ from contextlib import asynccontextmanager
 from typing import Annotated
 
 from fastapi import FastAPI, HTTPException, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session, select
 
 from auth import create_access_token, get_current_user, hash_password, verify_password
 from database import create_db_and_tables, get_session
 from models import Task, User
-from schemas import TaskCreate, TaskRead, TaskUpdate, Token
+from schemas import TaskCreate, TaskRead, TaskUpdate, Token, UserCreate
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     create_db_and_tables()
     yield
+
 app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://todo1-fastapi.com", "http://localhost:5173", "http://localhost"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.post("/tasks", response_model=TaskRead)
 async def create_task(
@@ -91,13 +101,12 @@ async def delte_task(
 
 @app.post("/register")
 async def register(
-    username: str,
-    password: str,
+    user_data: UserCreate,
     session: Annotated[Session, Depends(get_session)],
 ):
     user = User(
-        username=username,
-        hashed_password=hash_password(password),
+        username=user_data.username,
+        hashed_password=hash_password(user_data.password),
     )
     session.add(user)
     session.commit()

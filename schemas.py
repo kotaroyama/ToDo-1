@@ -16,6 +16,7 @@ class TaskCreate(BaseModel):
     description: str | None = None
     completed: bool | None = False
 
+
 class TaskRead(BaseModel):
     id: int
     title: str
@@ -27,3 +28,8 @@ class TaskUpdate(SQLModel):
     title: str | None = None
     description: str | None = None
     completed: bool | None = None
+
+
+class UserCreate(SQLModel):
+    username: str
+    password: str
