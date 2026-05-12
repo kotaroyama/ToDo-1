@@ -72,10 +72,11 @@ export default function Tasks() {
           placeholder="Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          required
         />
         <input
           type="text"
-          placeholder="Description"
+          placeholder="Description - Optional"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
