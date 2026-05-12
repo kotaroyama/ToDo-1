@@ -39,9 +39,9 @@ async def get_current_user(
     session: Annotated[Session, Depends(get_session)]
 ):
     credentials_exception = HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Could not validate crendentails",
-                headers={"WWW-Authenticate": "Bearer"},
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate crendentails",
+        headers={"WWW-Authenticate": "Bearer"},
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
