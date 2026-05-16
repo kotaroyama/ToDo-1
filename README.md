@@ -53,7 +53,6 @@ PostgreSQL (Amazon RDS)
 ###
 - Docker
 - Docker Compose
-- 
 
 ### Setup
 
