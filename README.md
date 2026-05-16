@@ -56,6 +56,8 @@ PostgreSQL (Amazon RDS)
 - 
 
 ### Setup
+
+First, git clone this repo
 ```bash
 git clone https://github.com/kotaroyama/ToDo-1.git
 cd ToDo-1
