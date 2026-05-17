@@ -64,7 +64,7 @@ export default function Tasks() {
   }
 
   return (
-    <div className="rounded-xl bg-slate-50 p-5 shadow-sm">
+    <div className="mx-auto max-w-3xl rounded-xl bg-slate-50 p-5 shadow-sm">
       <h2 className="mb-5 text-center text-2xl font-bold">Tasks</h2>
       <form 
         className="mb-5 flex overflow-hidden rounded-md bg-white shadow-sm" 

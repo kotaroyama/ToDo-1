@@ -45,7 +45,7 @@ export default function Register() {
   }
 
   return (
-    <div className="rounded-xl bg-slate-50 p-6 shadow-sm">
+    <div className="mx-auto max-w-2xl rounded-xl bg-slate-50 p-6 shadow-sm">
       <h2 className="mb-5 text-center text-2xl font-bold">Register</h2>
       <form
         className="space-y-3"

@@ -61,7 +61,7 @@ export default function TaskDetail() {
   if (!task) return <p>Loading...</p>;
 
   return (
-    <div>
+    <div className="mx-auto max-w-3xl">
       {!isEditing ? (
         <div className="rounded-xl bg-slate-50 p-6 shadow-sm">
           <h2 className="mb-3 text-3xl font-bold">{task.title}</h2>
