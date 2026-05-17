@@ -20,6 +20,7 @@ Backend API Docs: https://todo1-fastapi.com/docs
 - SQLModel
 - PostgreSQL
 - JWT Authentication
+- Alembic
 
 ### Frontend
 - React
