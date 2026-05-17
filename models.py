@@ -15,6 +15,6 @@ class User(SQLModel, table=True):
     __tablename__ = "users"
 
     id: int | None = Field(default=None, primary_key=True)
-    username: str = Field(max_length=100, index=True)
+    username: str = Field(max_length=100, unique=True, index=True)
     hashed_password: str
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

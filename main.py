@@ -4,6 +4,7 @@ from typing import Annotated
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, select
 
 from auth import create_access_token, get_current_user, hash_password, verify_password
@@ -108,9 +109,20 @@ async def register(
         username=user_data.username,
         hashed_password=hash_password(user_data.password),
     )
+    
     session.add(user)
-    session.commit()
-    session.refresh(user)
+
+    try:
+        session.commit()
+        session.refresh(user)
+    except IntegrityError:
+        session.rollback()
+
+        raise HTTPException (
+            status_code=400,
+            detail="Username already exists",
+        )
+    
     return user
 
 @app.post("/token")

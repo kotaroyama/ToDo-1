@@ -27,6 +27,9 @@ export default function Register() {
       );
 
       if (!response.ok) {
+        if (response.status == 400) {
+          throw new Error("Username already exists");
+        } 
         throw new Error("Registration failed");
       }
       setStatus(true);
@@ -36,6 +39,8 @@ export default function Register() {
       }, 1000) 
     } catch (err) {
         setError(err.message);
+        setUsername("");
+        setPassword("");
     }
   }
 
